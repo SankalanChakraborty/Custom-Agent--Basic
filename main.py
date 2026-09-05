@@ -6,7 +6,7 @@ from Tools.get_exchange_rate import get_exchange_rates
 from Tools.get_weather import get_weather
 from Tools.web_search import search
 from Tools.create_note import create_note
-from Tools.File_Manager.list_files import list_files, read_file
+from Tools.File_Manager.list_files import list_files, read_file, create_file
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -122,6 +122,26 @@ read_file_tool = {
     }
 }
 
+create_file_tool = {
+    "tyep": "function",
+    "name": "create_file",
+    "description": "Create a new file at the specified path with optional content",
+    "parameters":{
+        "type": "object",
+        "properties":{
+            "path":{
+                "type": "string",
+                "description": "The path where the file will be created"
+            },
+            "content":{
+                "type": "string",
+                "description": "The content to write to the file (default is empty)"
+            },        
+        },
+        "required": ["path"]
+    }
+}
+
 
 def chat_with_gemini(prompt):
     history.append({
@@ -133,7 +153,7 @@ def chat_with_gemini(prompt):
         model="gemini-3.6-flash",
         store=False,
         input=history,
-        tools=[weather_tool, currency_converter_tool, web_search_tool, create_note_tool, list_files_tool, read_file_tool]
+        tools=[weather_tool, currency_converter_tool, web_search_tool, create_note_tool, list_files_tool, read_file_tool, create_file_tool]
        
     )
     return interaction
@@ -144,10 +164,10 @@ def continue_interaction():
         model="gemini-3.6-flash",
         store=False,
         input=history,
-        tools=[weather_tool, currency_converter_tool, web_search_tool, create_note_tool, list_files_tool, read_file_tool]
+        tools=[weather_tool, currency_converter_tool, web_search_tool, create_note_tool, list_files_tool, read_file_tool, create_file_tool]
     )
 
-available_functions = {"get_weather": get_weather, "get_exchange_rates": get_exchange_rates, "search": search, "create_note": create_note, "list_files": list_files, "read_file": read_file}
+available_functions = {"get_weather": get_weather, "get_exchange_rates": get_exchange_rates, "search": search, "create_note": create_note, "list_files": list_files, "read_file": read_file, "create_file": create_file}
 
 def main():
     print("Welcome to Gemini Chat! Type 'exit' to quit.")
